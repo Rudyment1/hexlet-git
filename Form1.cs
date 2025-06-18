@@ -1,17 +1,17 @@
-using System.Windows.Forms;
+п»їusing System.Windows.Forms;
 
 namespace Scoreboard
 {
     public partial class Form1 : Form
-    {   // Перменная нужная для сохранения предыдущего предупреждения синего
+    {   // РџРµСЂРјРµРЅРЅР°СЏ РЅСѓР¶РЅР°СЏ РґР»СЏ СЃРѕС…СЂР°РЅРµРЅРёСЏ РїСЂРµРґС‹РґСѓС‰РµРіРѕ РїСЂРµРґСѓРїСЂРµР¶РґРµРЅРёСЏ СЃРёРЅРµРіРѕ
         private int _previousBlueWarning = 0;
         private int _previousRedWarning = 0;
-        // Переменная хранящее начальное время
+        // РџРµСЂРµРјРµРЅРЅР°СЏ С…СЂР°РЅСЏС‰РµРµ РЅР°С‡Р°Р»СЊРЅРѕРµ РІСЂРµРјСЏ
         private int _remainingSeconds = 300;
         private int _retentionBlueSecond = 0;
         private int _retentionRedSecond = 0;
         private const int STARTTIME = 300;
-        // Редактируется ли таймер
+        // Р РµРґР°РєС‚РёСЂСѓРµС‚СЃСЏ Р»Рё С‚Р°Р№РјРµСЂ
         private bool _isInternalChange = false;
         public Form1()
         {
@@ -46,7 +46,7 @@ namespace Scoreboard
 
         private void button6_Click(object sender, EventArgs e)
         {
-            StartStopContractionTimer(ContractionTimer, button6, textBox3, ref _remainingSeconds, "Старт");
+            StartStopContractionTimer(ContractionTimer, button6, textBox3, ref _remainingSeconds, "РЎС‚Р°СЂС‚");
         }
 
         private void button7_Click(object sender, EventArgs e)
@@ -58,7 +58,7 @@ namespace Scoreboard
         {
             int difference = STARTTIME - _remainingSeconds;
             string time = $"{(difference / 60)}:{(difference % 60):D2}";
-            MessageBox.Show($"Время с начала схватки: {time}");
+            MessageBox.Show($"Р’СЂРµРјСЏ СЃ РЅР°С‡Р°Р»Р° СЃС…РІР°С‚РєРё: {time}");
         }
 
         private void button9_Click(object sender, EventArgs e)
@@ -68,12 +68,12 @@ namespace Scoreboard
 
         private void button10_Click(object sender, EventArgs e)
         {
-            StartStopContractionTimer(timer1, button10, textBox4, ref _retentionRedSecond, "Удерж");
+            StartStopContractionTimer(timer1, button10, textBox4, ref _retentionRedSecond, "РЈРґРµСЂР¶");
         }
 
         private void button11_Click(object sender, EventArgs e)
         {
-            StartStopContractionTimer(timer2, button11, textBox5, ref _retentionBlueSecond, "Удерж");
+            StartStopContractionTimer(timer2, button11, textBox5, ref _retentionBlueSecond, "РЈРґРµСЂР¶");
         }
 
         private void button13_Click(object sender, EventArgs e)
@@ -195,12 +195,13 @@ namespace Scoreboard
 
             txtBox.SelectionStart = nextCursor;
         }
-        private void StartStopContractionTimer(System.Windows.Forms.Timer timer, Button button, TextBox timeBox, ref int timeInSeconds, string message)
+        private void StartStopContractionTimer(System.Windows.Forms.Timer timer, Button button, 
+            TextBox timeBox, ref int timeInSeconds, string message)
         {
             if (!timer.Enabled && !timeBox.Text.Contains('_'))
             {
                 timer.Start();
-                button.Text = "Стоп";
+                button.Text = "РЎС‚РѕРї";
             }
             else if (timer.Enabled)
             {
@@ -211,19 +212,19 @@ namespace Scoreboard
             }
             else
             {
-                MessageBox.Show("Введите время полностью в формате m:ss");
+                MessageBox.Show("Р’РІРµРґРёС‚Рµ РІСЂРµРјСЏ РїРѕР»РЅРѕСЃС‚СЊСЋ РІ С„РѕСЂРјР°С‚Рµ m:ss");
             }
         }
 
 
         private void OnContractionTimerTick(System.Windows.Forms.Timer timer, ref int timeInSeconds, TextBox txtBox)
         {
-            if (_remainingSeconds > 0)
+            if (timeInSeconds > 0)
             {
-                _remainingSeconds--;
+                timeInSeconds--;
 
 
-                txtBox.Text = $"{(_remainingSeconds / 60)}:{(_remainingSeconds % 60):D2}";
+                txtBox.Text = $"{(timeInSeconds / 60)}:{(timeInSeconds % 60):D2}";
             }
             else
             {
@@ -256,7 +257,7 @@ namespace Scoreboard
         private void StopAllTimer()
         {
             timer1.Stop();
-            button10.Text = "Удерж";
+            button10.Text = "РЈРґРµСЂР¶";
         }
 
         private void ModifyScore(TextBox textBox, int change)
@@ -283,15 +284,15 @@ namespace Scoreboard
 
         private void NumericTextBox_KeyPress(object sender, KeyPressEventArgs e)
         {
-            // Фильтр ввода в оценки 
+            // Р¤РёР»СЊС‚СЂ РІРІРѕРґР° РІ РѕС†РµРЅРєРё 
             if (e.KeyChar == '.' || !char.IsDigit(e.KeyChar) && e.KeyChar != (char)Keys.Back &&
                e.KeyChar != (char)Keys.Delete)
             {
                 e.Handled = true;
             }
-            /* Как происходит
-             У нас имеется e.Key это вводимый символ и если он не является предсталеным
-            случаям то он вводиться если нет то он пропускаеся(e.Handled = true) */
+            /* РљР°Рє РїСЂРѕРёСЃС…РѕРґРёС‚
+             РЈ РЅР°СЃ РёРјРµРµС‚СЃСЏ e.Key СЌС‚Рѕ РІРІРѕРґРёРјС‹Р№ СЃРёРјРІРѕР» Рё РµСЃР»Рё РѕРЅ РЅРµ СЏРІР»СЏРµС‚СЃСЏ РїСЂРµРґСЃС‚Р°Р»РµРЅС‹Рј
+            СЃР»СѓС‡Р°СЏРј С‚Рѕ РѕРЅ РІРІРѕРґРёС‚СЊСЃСЏ РµСЃР»Рё РЅРµС‚ С‚Рѕ РѕРЅ РїСЂРѕРїСѓСЃРєР°РµСЃСЏ(e.Handled = true) */
         }
 
       
