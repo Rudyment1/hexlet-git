@@ -44,6 +44,16 @@
             button6 = new Button();
             button7 = new Button();
             button8 = new Button();
+            textBox4 = new TextBox();
+            timer1 = new System.Windows.Forms.Timer(components);
+            button9 = new Button();
+            button10 = new Button();
+            button11 = new Button();
+            button12 = new Button();
+            textBox5 = new TextBox();
+            button13 = new Button();
+            button14 = new Button();
+            timer2 = new System.Windows.Forms.Timer(components);
             SuspendLayout();
             // 
             // textBox1
@@ -51,7 +61,7 @@
             textBox1.AccessibleRole = AccessibleRole.None;
             textBox1.AutoCompleteMode = AutoCompleteMode.Suggest;
             textBox1.Font = new Font("Segoe UI", 45F);
-            textBox1.Location = new Point(535, 52);
+            textBox1.Location = new Point(537, 44);
             textBox1.MaxLength = 2;
             textBox1.Name = "textBox1";
             textBox1.Size = new Size(73, 87);
@@ -67,7 +77,7 @@
             button1.BackgroundImageLayout = ImageLayout.Zoom;
             button1.Cursor = Cursors.Hand;
             button1.FlatStyle = FlatStyle.Popup;
-            button1.Location = new Point(614, 46);
+            button1.Location = new Point(616, 38);
             button1.Name = "button1";
             button1.Size = new Size(75, 48);
             button1.TabIndex = 1;
@@ -81,7 +91,7 @@
             button2.BackgroundImageLayout = ImageLayout.Zoom;
             button2.Cursor = Cursors.Hand;
             button2.FlatStyle = FlatStyle.Popup;
-            button2.Location = new Point(614, 95);
+            button2.Location = new Point(616, 87);
             button2.Name = "button2";
             button2.Size = new Size(75, 48);
             button2.TabIndex = 2;
@@ -95,7 +105,7 @@
             button4.BackgroundImageLayout = ImageLayout.Zoom;
             button4.Cursor = Cursors.Hand;
             button4.FlatStyle = FlatStyle.Popup;
-            button4.Location = new Point(614, 392);
+            button4.Location = new Point(616, 384);
             button4.Name = "button4";
             button4.Size = new Size(75, 48);
             button4.TabIndex = 5;
@@ -109,7 +119,7 @@
             button3.BackgroundImageLayout = ImageLayout.Zoom;
             button3.Cursor = Cursors.Hand;
             button3.FlatStyle = FlatStyle.Popup;
-            button3.Location = new Point(614, 349);
+            button3.Location = new Point(616, 341);
             button3.Name = "button3";
             button3.Size = new Size(75, 48);
             button3.TabIndex = 4;
@@ -122,7 +132,7 @@
             textBox2.AccessibleRole = AccessibleRole.None;
             textBox2.AutoCompleteMode = AutoCompleteMode.Suggest;
             textBox2.Font = new Font("Segoe UI", 45F);
-            textBox2.Location = new Point(535, 349);
+            textBox2.Location = new Point(537, 341);
             textBox2.MaxLength = 2;
             textBox2.Name = "textBox2";
             textBox2.Size = new Size(73, 87);
@@ -130,10 +140,11 @@
             textBox2.TabStop = false;
             textBox2.Text = "0";
             textBox2.TextAlign = HorizontalAlignment.Center;
+            textBox2.KeyPress += validateInputDigitsAndColon;
             // 
             // button5
             // 
-            button5.Location = new Point(20, 413);
+            button5.Location = new Point(22, 405);
             button5.Name = "button5";
             button5.Size = new Size(75, 23);
             button5.TabIndex = 6;
@@ -145,7 +156,7 @@
             comboBox1.DropDownStyle = ComboBoxStyle.DropDownList;
             comboBox1.FormattingEnabled = true;
             comboBox1.Items.AddRange(new object[] { "Нет", "0", "1", "2" });
-            comboBox1.Location = new Point(535, 149);
+            comboBox1.Location = new Point(537, 141);
             comboBox1.Name = "comboBox1";
             comboBox1.Size = new Size(73, 23);
             comboBox1.TabIndex = 7;
@@ -156,10 +167,11 @@
             comboBox2.DropDownStyle = ComboBoxStyle.DropDownList;
             comboBox2.FormattingEnabled = true;
             comboBox2.Items.AddRange(new object[] { "Нет", "0", "1", "2" });
-            comboBox2.Location = new Point(535, 320);
+            comboBox2.Location = new Point(537, 312);
             comboBox2.Name = "comboBox2";
             comboBox2.Size = new Size(73, 23);
             comboBox2.TabIndex = 8;
+            comboBox2.SelectedIndexChanged += comboBox2_SelectedIndexChanged;
             // 
             // ContractionTimer
             // 
@@ -169,18 +181,18 @@
             // textBox3
             // 
             textBox3.Font = new Font("Segoe UI", 72F, FontStyle.Regular, GraphicsUnit.Point, 204);
-            textBox3.Location = new Point(178, 181);
+            textBox3.Location = new Point(173, 166);
             textBox3.Name = "textBox3";
             textBox3.Size = new Size(235, 135);
             textBox3.TabIndex = 9;
-            textBox3.Text = "3:00";
+            textBox3.Text = "5:00";
             textBox3.TextAlign = HorizontalAlignment.Center;
             textBox3.TextChanged += textBox3_TextChanged;
-            textBox3.KeyPress += textBox3_KeyPress;
+            textBox3.KeyPress += validateInputDigitsAndColon;
             // 
             // button6
             // 
-            button6.Location = new Point(431, 181);
+            button6.Location = new Point(426, 166);
             button6.Name = "button6";
             button6.Size = new Size(75, 23);
             button6.TabIndex = 10;
@@ -190,21 +202,114 @@
             // 
             // button7
             // 
-            button7.Location = new Point(431, 237);
+            button7.Location = new Point(426, 222);
             button7.Name = "button7";
             button7.Size = new Size(75, 23);
             button7.TabIndex = 11;
-            button7.Text = "button7";
+            button7.Text = "Сброс";
             button7.UseVisualStyleBackColor = true;
+            button7.Click += button7_Click;
             // 
             // button8
             // 
-            button8.Location = new Point(431, 292);
+            button8.Location = new Point(426, 277);
             button8.Name = "button8";
             button8.Size = new Size(75, 23);
             button8.TabIndex = 12;
-            button8.Text = "button8";
+            button8.Text = "Время";
             button8.UseVisualStyleBackColor = true;
+            button8.Click += button8_Click;
+            // 
+            // textBox4
+            // 
+            textBox4.Font = new Font("Segoe UI", 25F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            textBox4.Location = new Point(525, 170);
+            textBox4.Multiline = true;
+            textBox4.Name = "textBox4";
+            textBox4.Size = new Size(85, 50);
+            textBox4.TabIndex = 13;
+            textBox4.Text = "0:00";
+            textBox4.TextChanged += textBox4_TextChanged;
+            // 
+            // timer1
+            // 
+            timer1.Interval = 1000;
+            timer1.Tick += timer1_Tick;
+            // 
+            // button9
+            // 
+            button9.Location = new Point(616, 141);
+            button9.Name = "button9";
+            button9.Size = new Size(75, 23);
+            button9.TabIndex = 14;
+            button9.Text = "Болевой";
+            button9.UseVisualStyleBackColor = true;
+            button9.Click += button9_Click;
+            // 
+            // button10
+            // 
+            button10.Location = new Point(616, 168);
+            button10.Name = "button10";
+            button10.Size = new Size(75, 23);
+            button10.TabIndex = 15;
+            button10.Text = "Удерж";
+            button10.UseVisualStyleBackColor = true;
+            button10.Click += button10_Click;
+            // 
+            // button11
+            // 
+            button11.Location = new Point(616, 283);
+            button11.Name = "button11";
+            button11.Size = new Size(75, 23);
+            button11.TabIndex = 18;
+            button11.Text = "Удерж";
+            button11.UseVisualStyleBackColor = true;
+            button11.Click += button11_Click;
+            // 
+            // button12
+            // 
+            button12.Location = new Point(616, 311);
+            button12.Name = "button12";
+            button12.Size = new Size(75, 23);
+            button12.TabIndex = 17;
+            button12.Text = "Болевой";
+            button12.UseVisualStyleBackColor = true;
+            // 
+            // textBox5
+            // 
+            textBox5.Font = new Font("Segoe UI", 25F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            textBox5.Location = new Point(525, 256);
+            textBox5.Multiline = true;
+            textBox5.Name = "textBox5";
+            textBox5.Size = new Size(85, 50);
+            textBox5.TabIndex = 16;
+            textBox5.Text = "0:00";
+            textBox5.TextChanged += textBox5_TextChanged;
+            // 
+            // button13
+            // 
+            button13.Location = new Point(616, 197);
+            button13.Name = "button13";
+            button13.Size = new Size(75, 23);
+            button13.TabIndex = 19;
+            button13.Text = "Сброс";
+            button13.UseVisualStyleBackColor = true;
+            button13.Click += button13_Click;
+            // 
+            // button14
+            // 
+            button14.Location = new Point(616, 256);
+            button14.Name = "button14";
+            button14.Size = new Size(75, 23);
+            button14.TabIndex = 20;
+            button14.Text = "Сброс";
+            button14.UseVisualStyleBackColor = true;
+            button14.Click += button14_Click;
+            // 
+            // timer2
+            // 
+            timer2.Interval = 1000;
+            timer2.Tick += timer2_Tick;
             // 
             // Form1
             // 
@@ -212,6 +317,14 @@
             AutoScaleDimensions = new SizeF(96F, 96F);
             AutoScaleMode = AutoScaleMode.Dpi;
             ClientSize = new Size(710, 455);
+            Controls.Add(button14);
+            Controls.Add(button13);
+            Controls.Add(button11);
+            Controls.Add(button12);
+            Controls.Add(textBox5);
+            Controls.Add(button10);
+            Controls.Add(button9);
+            Controls.Add(textBox4);
             Controls.Add(button8);
             Controls.Add(button7);
             Controls.Add(button6);
@@ -246,5 +359,15 @@
         private Button button6;
         private Button button7;
         private Button button8;
+        private TextBox textBox4;
+        private System.Windows.Forms.Timer timer1;
+        private Button button9;
+        private Button button10;
+        private Button button11;
+        private Button button12;
+        private TextBox textBox5;
+        private Button button13;
+        private Button button14;
+        private System.Windows.Forms.Timer timer2;
     }
 }
