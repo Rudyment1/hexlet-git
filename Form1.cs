@@ -13,6 +13,7 @@ namespace Scoreboard
         private const int STARTTIME = 300;
         // Редактируется ли таймер
         private bool _isInternalChange = false;
+        private Button _holdIsOn;
         public Form1()
         {
             InitializeComponent();
@@ -63,7 +64,7 @@ namespace Scoreboard
 
         private void button9_Click(object sender, EventArgs e)
         {
-
+            StartStopContractionTimer(timer1, button9, textBox4, ref _retentionRedSecond, "Болевой");
         }
 
         private void button10_Click(object sender, EventArgs e)
@@ -75,7 +76,10 @@ namespace Scoreboard
         {
             StartStopContractionTimer(timer2, button11, textBox5, ref _retentionBlueSecond, "Удерж");
         }
-
+        private void button12_Click(object sender, EventArgs e)
+        {
+            StartStopContractionTimer(timer2, button12, textBox5, ref _retentionBlueSecond, "Болевой");
+        }
         private void button13_Click(object sender, EventArgs e)
         {
             RebootTimer(timer1, textBox4, 0, ref _retentionRedSecond);
@@ -84,7 +88,10 @@ namespace Scoreboard
         {
             RebootTimer(timer2, textBox5, 0, ref _retentionBlueSecond);
         }
+        private void button16_Click(object sender, EventArgs e)
+        {
 
+        }
         private void ContractionTimer_Tick(object sender, EventArgs e)
         {
             OnContractionTimerTick(ContractionTimer, ref _remainingSeconds, textBox3);
@@ -92,36 +99,35 @@ namespace Scoreboard
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            timerTicker(textBox4, ref _retentionRedSecond);
+            TimerTicker(textBox4, ref _retentionRedSecond, textBox1);
         }
         private void timer2_Tick(object sender, EventArgs e)
         {
-            timerTicker(textBox5, ref _retentionBlueSecond);
+            TimerTicker(textBox5, ref _retentionBlueSecond, textBox2);
+        }
+        private void timer3_Tick(object sender, EventArgs e)
+        {
         }
 
 
 
 
 
-
-        private void timerTicker(TextBox txtBox, ref int _retentionSecond)
+        private void TimerTicker(TextBox txtBox, ref int _retentionSecond, TextBox score)
         {
+
             _retentionSecond++;
+
+            if (_retentionSecond == 10 || _retentionSecond == 20)
+                ModifyScore(score, 2);
+
             txtBox.Text = $"{(_retentionSecond / 60)}:{(_retentionSecond % 60):D2}";
         }
         private void RebootTimer(System.Windows.Forms.Timer timer, TextBox timeBox, int starttime, ref int time)
         {
-            if (timer.Enabled)
-            {
-                timer.Stop();
-                time = starttime;
-                timeBox.Text = $"{(time / 60)}:{(time % 60):D2}";
-            }
-            else
-            {
-                time = starttime;
-                timeBox.Text = $"{(time / 60)}:{(time % 60):D2}";
-            }
+            if (timer.Enabled) timer.Stop();
+            time = starttime;
+            timeBox.Text = $"{(time / 60)}:{(time % 60):D2}";
         }
         private void textBox5_TextChanged(object sender, EventArgs e)
         {
@@ -195,20 +201,43 @@ namespace Scoreboard
 
             txtBox.SelectionStart = nextCursor;
         }
-        private void StartStopContractionTimer(System.Windows.Forms.Timer timer, Button button, 
+        private void StartStopContractionTimer(System.Windows.Forms.Timer timer, Button button,
             TextBox timeBox, ref int timeInSeconds, string message)
         {
             if (!timer.Enabled && !timeBox.Text.Contains('_'))
             {
+
+                _holdIsOn = button;
                 timer.Start();
                 button.Text = "Стоп";
             }
             else if (timer.Enabled)
             {
-                timer.Stop();
-                if (timer == ContractionTimer)
-                    StopAllTimer();
-                button.Text = message;
+                if (button.Text == "Стоп")
+                {
+                    timer.Stop();
+                    if (timer == ContractionTimer)
+                        StopAllTimer();
+                    button.Text = message;
+                }
+                else
+                {
+                    RebootTimer(timer, timeBox, 0, ref timeInSeconds);
+                    if (button.Text == "Болевой")
+                    {
+                        _holdIsOn.Text = "Удерж";
+                        button.Text = "Стоп";
+                        timer.Start();
+
+                    }
+                    else
+                    {
+                        _holdIsOn.Text = "Болевой";
+                        button.Text = "Стоп";
+                        timer.Start();
+
+                    }
+                }
             }
             else
             {
@@ -258,6 +287,8 @@ namespace Scoreboard
         {
             timer1.Stop();
             button10.Text = "Удерж";
+            timer2.Stop();
+            button11.Text = "Удерж";
         }
 
         private void ModifyScore(TextBox textBox, int change)
@@ -272,7 +303,7 @@ namespace Scoreboard
 
 
 
-        private void validateInputDigitsAndColon(object sender, KeyPressEventArgs e)
+        private void ValidateInputDigitsAndColon(object sender, KeyPressEventArgs e)
         {
             if (!char.IsDigit(e.KeyChar) && e.KeyChar != (char)Keys.Back &&
                 e.KeyChar != (char)Keys.Delete && e.KeyChar != ':')
@@ -295,6 +326,6 @@ namespace Scoreboard
             случаям то он вводиться если нет то он пропускаеся(e.Handled = true) */
         }
 
-      
+
     }
 }

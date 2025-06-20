@@ -54,6 +54,13 @@
             button13 = new Button();
             button14 = new Button();
             timer2 = new System.Windows.Forms.Timer(components);
+            button15 = new Button();
+            button16 = new Button();
+            textBox6 = new TextBox();
+            button17 = new Button();
+            button18 = new Button();
+            textBox7 = new TextBox();
+            timer3 = new System.Windows.Forms.Timer(components);
             SuspendLayout();
             // 
             // textBox1
@@ -77,9 +84,9 @@
             button1.BackgroundImageLayout = ImageLayout.Zoom;
             button1.Cursor = Cursors.Hand;
             button1.FlatStyle = FlatStyle.Popup;
-            button1.Location = new Point(616, 38);
+            button1.Location = new Point(616, 44);
             button1.Name = "button1";
-            button1.Size = new Size(75, 48);
+            button1.Size = new Size(75, 41);
             button1.TabIndex = 1;
             button1.TabStop = false;
             button1.UseVisualStyleBackColor = true;
@@ -91,9 +98,9 @@
             button2.BackgroundImageLayout = ImageLayout.Zoom;
             button2.Cursor = Cursors.Hand;
             button2.FlatStyle = FlatStyle.Popup;
-            button2.Location = new Point(616, 87);
+            button2.Location = new Point(616, 91);
             button2.Name = "button2";
-            button2.Size = new Size(75, 48);
+            button2.Size = new Size(75, 40);
             button2.TabIndex = 2;
             button2.TabStop = false;
             button2.UseVisualStyleBackColor = true;
@@ -105,9 +112,9 @@
             button4.BackgroundImageLayout = ImageLayout.Zoom;
             button4.Cursor = Cursors.Hand;
             button4.FlatStyle = FlatStyle.Popup;
-            button4.Location = new Point(616, 384);
+            button4.Location = new Point(616, 388);
             button4.Name = "button4";
-            button4.Size = new Size(75, 48);
+            button4.Size = new Size(75, 40);
             button4.TabIndex = 5;
             button4.TabStop = false;
             button4.UseVisualStyleBackColor = true;
@@ -121,7 +128,7 @@
             button3.FlatStyle = FlatStyle.Popup;
             button3.Location = new Point(616, 341);
             button3.Name = "button3";
-            button3.Size = new Size(75, 48);
+            button3.Size = new Size(75, 42);
             button3.TabIndex = 4;
             button3.TabStop = false;
             button3.UseVisualStyleBackColor = true;
@@ -140,7 +147,7 @@
             textBox2.TabStop = false;
             textBox2.Text = "0";
             textBox2.TextAlign = HorizontalAlignment.Center;
-            textBox2.KeyPress += validateInputDigitsAndColon;
+            textBox2.KeyPress += ValidateInputDigitsAndColon;
             // 
             // button5
             // 
@@ -188,7 +195,7 @@
             textBox3.Text = "5:00";
             textBox3.TextAlign = HorizontalAlignment.Center;
             textBox3.TextChanged += textBox3_TextChanged;
-            textBox3.KeyPress += validateInputDigitsAndColon;
+            textBox3.KeyPress += ValidateInputDigitsAndColon;
             // 
             // button6
             // 
@@ -222,7 +229,9 @@
             // 
             // textBox4
             // 
+            textBox4.BackColor = SystemColors.Window;
             textBox4.Font = new Font("Segoe UI", 25F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            textBox4.ForeColor = SystemColors.WindowText;
             textBox4.Location = new Point(525, 170);
             textBox4.Multiline = true;
             textBox4.Name = "textBox4";
@@ -274,9 +283,11 @@
             button12.TabIndex = 17;
             button12.Text = "Болевой";
             button12.UseVisualStyleBackColor = true;
+            button12.Click += button12_Click;
             // 
             // textBox5
             // 
+            textBox5.BackColor = SystemColors.Window;
             textBox5.Font = new Font("Segoe UI", 25F, FontStyle.Regular, GraphicsUnit.Point, 204);
             textBox5.Location = new Point(525, 256);
             textBox5.Multiline = true;
@@ -311,12 +322,80 @@
             timer2.Interval = 1000;
             timer2.Tick += timer2_Tick;
             // 
+            // button15
+            // 
+            button15.Location = new Point(388, 91);
+            button15.Name = "button15";
+            button15.Size = new Size(75, 23);
+            button15.TabIndex = 23;
+            button15.Text = "Сброс";
+            button15.UseVisualStyleBackColor = true;
+            // 
+            // button16
+            // 
+            button16.Location = new Point(388, 62);
+            button16.Name = "button16";
+            button16.Size = new Size(75, 23);
+            button16.TabIndex = 22;
+            button16.Text = "Старт";
+            button16.UseVisualStyleBackColor = true;
+            button16.Click += button16_Click;
+            // 
+            // textBox6
+            // 
+            textBox6.Font = new Font("Segoe UI", 42F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            textBox6.Location = new Point(228, 44);
+            textBox6.Multiline = true;
+            textBox6.Name = "textBox6";
+            textBox6.Size = new Size(144, 91);
+            textBox6.TabIndex = 21;
+            textBox6.Text = "0:00";
+            // 
+            // button17
+            // 
+            button17.Location = new Point(388, 388);
+            button17.Name = "button17";
+            button17.Size = new Size(75, 23);
+            button17.TabIndex = 26;
+            button17.Text = "Сброс";
+            button17.UseVisualStyleBackColor = true;
+            // 
+            // button18
+            // 
+            button18.Location = new Point(388, 359);
+            button18.Name = "button18";
+            button18.Size = new Size(75, 23);
+            button18.TabIndex = 25;
+            button18.Text = "Удерж";
+            button18.UseVisualStyleBackColor = true;
+            // 
+            // textBox7
+            // 
+            textBox7.Font = new Font("Segoe UI", 42F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            textBox7.Location = new Point(228, 341);
+            textBox7.Multiline = true;
+            textBox7.Name = "textBox7";
+            textBox7.Size = new Size(144, 87);
+            textBox7.TabIndex = 24;
+            textBox7.Text = "0:00";
+            // 
+            // timer3
+            // 
+            timer3.Interval = 1000;
+            timer3.Tick += timer3_Tick;
+            // 
             // Form1
             // 
             AcceptButton = button5;
             AutoScaleDimensions = new SizeF(96F, 96F);
             AutoScaleMode = AutoScaleMode.Dpi;
             ClientSize = new Size(710, 455);
+            Controls.Add(button17);
+            Controls.Add(button18);
+            Controls.Add(textBox7);
+            Controls.Add(button15);
+            Controls.Add(button16);
+            Controls.Add(textBox6);
             Controls.Add(button14);
             Controls.Add(button13);
             Controls.Add(button11);
@@ -369,5 +448,12 @@
         private Button button13;
         private Button button14;
         private System.Windows.Forms.Timer timer2;
+        private Button button15;
+        private Button button16;
+        private TextBox textBox6;
+        private Button button17;
+        private Button button18;
+        private TextBox textBox7;
+        private System.Windows.Forms.Timer timer3;
     }
 }
