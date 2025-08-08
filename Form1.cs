@@ -1,4 +1,4 @@
-﻿using System.Windows.Forms;
+﻿
 
 namespace Scoreboard
 {
@@ -10,117 +10,204 @@ namespace Scoreboard
         private int _remainingSeconds = 300;
         private int _retentionBlueSecond = 0;
         private int _retentionRedSecond = 0;
+        private int _medicalTimeRed = 0;
+        private int _medicalTimeBlue = 0;
         private const int STARTTIME = 300;
         // Редактируется ли таймер
         private bool _isInternalChange = false;
-        private Button _holdIsOn;
+        private Form2 viewerForm;
+        private string folder = "participants";
+        private Size _originalFormSize;
+        private Dictionary<Control, (Rectangle Bounds, float FontSize)> _originalControls;
         public Form1()
         {
             InitializeComponent();
-        }
+            Directory.CreateDirectory(folder);
+            viewerForm = new Form2();
+            viewerForm.Show();
+            UpdateAutoComplete();
+            _originalFormSize = this.Size;
+            _originalControls = new Dictionary<Control, (Rectangle, float)>();
 
+            foreach (Control ctrl in this.Controls)
+            {
+                _originalControls[ctrl] = (ctrl.Bounds, ctrl.Font.Size);
+            }
+        }
+        protected override void OnResize(EventArgs e)
+        {
+            base.OnResize(e);
+            ResizeAllControls();
+        }
+        private void ResizeAllControls()
+        {
+            float xRatio = (float)this.Width / _originalFormSize.Width;
+            float yRatio = (float)this.Height / _originalFormSize.Height;
+
+            foreach (Control ctrl in this.Controls)
+            {
+                if (!_originalControls.ContainsKey(ctrl)) continue;
+
+                var (originalBounds, originalFontSize) = _originalControls[ctrl];
+
+                ctrl.Bounds = new Rectangle(
+                    (int)(originalBounds.X * xRatio),
+                    (int)(originalBounds.Y * yRatio),
+                    (int)(originalBounds.Width * xRatio),
+                    (int)(originalBounds.Height * yRatio)
+                );
+
+                ctrl.Font = new Font(ctrl.Font.FontFamily, originalFontSize * Math.Min(xRatio, yRatio), ctrl.Font.Style);
+            }
+        }
 
 
         private void IncreaseScore_Click(object sender, EventArgs e)
         {
             var button = (Button)sender;
-            var associatedTextBox = button == button1 ? textBox1 : textBox2;
+            var associatedTextBox = button == IncreaseRed ? ScoreRed : ScoreBlue;
             ModifyScore(associatedTextBox, 1);
         }
 
         private void DecreaseScore_Click(object sender, EventArgs e)
         {
             var button = (Button)sender;
-            var associatedTextBox = button == button2 ? textBox1 : textBox2;
+            var associatedTextBox = button == DecreaseRed ? ScoreRed : ScoreBlue;
             ModifyScore(associatedTextBox, -1);
         }
 
-        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        private void WarningSelectedIndexChanged(object sender, EventArgs e)
         {
-            UpdateWarningScore(comboBox1, ref _previousRedWarning, textBox1);
+            var cmb = (ComboBox)sender;
+            ref var previousWarning = ref (cmb == BlueWarning ? ref _previousBlueWarning : ref _previousRedWarning);
+            var scoreBox = cmb == BlueWarning ? ScoreRed : ScoreBlue;
+            UpdateWarningScore(cmb, ref previousWarning, scoreBox);
         }
 
-        private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
+        private void BtnStartStopMainClick(object sender, EventArgs e)
         {
-            UpdateWarningScore(comboBox2, ref _previousBlueWarning, textBox2);
+            StartStopContractionTimer(ContractionTimer, BtnStartStopMain, MainTime, ref _remainingSeconds, "Старт");
         }
 
-        private void button6_Click(object sender, EventArgs e)
+        private void BtnResetMainTimeClick(object sender, EventArgs e)
         {
-            StartStopContractionTimer(ContractionTimer, button6, textBox3, ref _remainingSeconds, "Старт");
+            BtnStartStopMain.Text = "Старт";
+            RebootTimer(ContractionTimer, MainTime, STARTTIME, ref _remainingSeconds);
+            viewerForm.SetMainTime(MainTime.Text);
+            viewerForm.SetMainForeColor(false);
         }
 
-        private void button7_Click(object sender, EventArgs e)
-        {
-            RebootTimer(ContractionTimer, textBox3, STARTTIME, ref _remainingSeconds);
-        }
-
-        private void button8_Click(object sender, EventArgs e)
+        private void BtnShowTimeElapsedClick(object sender, EventArgs e)
         {
             int difference = STARTTIME - _remainingSeconds;
             string time = $"{(difference / 60)}:{(difference % 60):D2}";
             MessageBox.Show($"Время с начала схватки: {time}");
         }
 
-        private void button9_Click(object sender, EventArgs e)
+        private void BtnRetentionRedClick(object sender, EventArgs e)
         {
-            StartStopContractionTimer(timer1, button9, textBox4, ref _retentionRedSecond, "Болевой");
+            BtnRetentionRed.Text = "Удерж";
+            StartStopContractionTimer(RedRetentionTimer, BtnPainfulHoldRed, TxtBoxRetentionRed, ref _retentionRedSecond, "Болевой");
         }
 
-        private void button10_Click(object sender, EventArgs e)
+        private void BtnPainfulHoldRedClick(object sender, EventArgs e)
         {
-            StartStopContractionTimer(timer1, button10, textBox4, ref _retentionRedSecond, "Удерж");
+            BtnPainfulHoldRed.Text = "Болевой";
+            StartStopContractionTimer(RedRetentionTimer, BtnRetentionRed, TxtBoxRetentionRed, ref _retentionRedSecond, "Удерж");
         }
 
-        private void button11_Click(object sender, EventArgs e)
+        private void BtnPainfulHoldBlueClick(object sender, EventArgs e)
         {
-            StartStopContractionTimer(timer2, button11, textBox5, ref _retentionBlueSecond, "Удерж");
-        }
-        private void button12_Click(object sender, EventArgs e)
-        {
-            StartStopContractionTimer(timer2, button12, textBox5, ref _retentionBlueSecond, "Болевой");
-        }
-        private void button13_Click(object sender, EventArgs e)
-        {
-            RebootTimer(timer1, textBox4, 0, ref _retentionRedSecond);
-        }
-        private void button14_Click(object sender, EventArgs e)
-        {
-            RebootTimer(timer2, textBox5, 0, ref _retentionBlueSecond);
-        }
-        private void button16_Click(object sender, EventArgs e)
-        {
-
-        }
-        private void ContractionTimer_Tick(object sender, EventArgs e)
-        {
-            OnContractionTimerTick(ContractionTimer, ref _remainingSeconds, textBox3);
+            BtnPainfulHoldBlue.Text = "Болевой";
+            StartStopContractionTimer(BlueRetentionTimer, BtnRetentionBlue, TxtBoxRetentionBlue, ref _retentionBlueSecond, "Удерж");
         }
 
-        private void timer1_Tick(object sender, EventArgs e)
+        private void BtnRetentionBlueClick(object sender, EventArgs e)
         {
-            TimerTicker(textBox4, ref _retentionRedSecond, textBox1);
+            BtnRetentionBlue.Text = "Удерж";
+            StartStopContractionTimer(BlueRetentionTimer, BtnPainfulHoldBlue, TxtBoxRetentionBlue, ref _retentionBlueSecond, "Болевой");
         }
-        private void timer2_Tick(object sender, EventArgs e)
+        private void BtnStartStopMedicalTimeRedClick(object sender, EventArgs e)
         {
-            TimerTicker(textBox5, ref _retentionBlueSecond, textBox2);
+            StartStopContractionTimer(RedTimeMedical, BtnStartStopMedicalTimeRed, TxtBoxMedicalRed, ref _medicalTimeRed, "Старт");
         }
-        private void timer3_Tick(object sender, EventArgs e)
+        private void BtnStartStopMedicalTimeBlueClick(object sender, EventArgs e)
         {
+            StartStopContractionTimer(BlueTimeMedical, BtnStartStopMedicalTimeBlue, TxtBoxMedicalRed, ref _medicalTimeBlue, "Старт");
+        }
+        private void BtnResetRetentionRedClick(object sender, EventArgs e)
+        {
+            BtnRetentionRed.Text = "Удерж";
+            BtnPainfulHoldRed.Text = "Болевой";
+            RebootTimer(RedRetentionTimer, TxtBoxRetentionRed, 0, ref _retentionRedSecond);
+            viewerForm.SetHoldRed("");
+        }
+        private void BtnResetRetentionBlueClick(object sender, EventArgs e)
+        {
+            BtnPainfulHoldBlue.Text = "Болевой";
+            BtnRetentionBlue.Text = "Удерж";
+            RebootTimer(BlueRetentionTimer, TxtBoxRetentionBlue, 0, ref _retentionBlueSecond);
+            viewerForm.SetHoldBlue("");
+        }
+        private void BtnResetMedicalTimeRedClick(object sender, EventArgs e)
+        {
+            BtnStartStopMedicalTimeRed.Text = "Старт";
+            RebootTimer(RedTimeMedical, TxtBoxMedicalRed, 0, ref _medicalTimeRed);
+        }
+
+        private void BtnResetMedicalTimeBlueClick(object sender, EventArgs e)
+        {
+            BtnStartStopMedicalTimeBlue.Text = "Старт";
+            RebootTimer(BlueTimeMedical, TxtBoxMedicalBlue, 0, ref _medicalTimeBlue);
+        }
+        private void BtnFullScreenClick(object sender, EventArgs e)
+        {
+            viewerForm.SetFullScreen();
+        }
+        private void ContractionTimerTick(object sender, EventArgs e)
+        {
+            OnContractionTimerTick(ContractionTimer, ref _remainingSeconds, MainTime);
+            viewerForm.SetMainTime(MainTime.Text);
+        }
+
+        private void RedRetentionTimerTick(object sender, EventArgs e)
+        {
+            TimerTicker(TxtBoxRetentionRed, ref _retentionRedSecond, ScoreRed);
+            viewerForm.SetHoldRed(TxtBoxRetentionRed.Text);
+        }
+        private void BlueRetentionTimerTick(object sender, EventArgs e)
+        {
+            TimerTicker(TxtBoxRetentionBlue, ref _retentionBlueSecond, ScoreBlue);
+            viewerForm.SetHoldBlue(TxtBoxRetentionBlue.Text);
+        }
+        private void RedTimeMedicalTick(object sender, EventArgs e)
+        {
+            TimerTickerTwo(TxtBoxMedicalRed, ref _medicalTimeRed);
+        }
+        private void BlueTimeMedicalTick(object sender, EventArgs e)
+        {
+            TimerTickerTwo(TxtBoxMedicalBlue, ref _medicalTimeBlue);
         }
 
 
 
 
-
-        private void TimerTicker(TextBox txtBox, ref int _retentionSecond, TextBox score)
+        private void TimerTicker(TextBox txtBox, ref int _retentionSecond, TextBox? score = null)
         {
 
             _retentionSecond++;
 
-            if (_retentionSecond == 10 || _retentionSecond == 20)
+            if ((_retentionSecond == 20 && BtnRetentionRed.Text == "Стоп" || _retentionSecond == 20 && BtnRetentionBlue.Text == "Стоп")
+                || (_retentionSecond == 10 && BtnRetentionRed.Text == "Стоп" || _retentionSecond == 10 && BtnRetentionBlue.Text == "Стоп"))
+            {
                 ModifyScore(score, 2);
+            }
 
+            txtBox.Text = $"{(_retentionSecond / 60)}:{(_retentionSecond % 60):D2}";
+        }
+        private void TimerTickerTwo(TextBox txtBox, ref int _retentionSecond)
+        {
+            _retentionSecond++;
             txtBox.Text = $"{(_retentionSecond / 60)}:{(_retentionSecond % 60):D2}";
         }
         private void RebootTimer(System.Windows.Forms.Timer timer, TextBox timeBox, int starttime, ref int time)
@@ -128,27 +215,29 @@ namespace Scoreboard
             if (timer.Enabled) timer.Stop();
             time = starttime;
             timeBox.Text = $"{(time / 60)}:{(time % 60):D2}";
+
         }
-        private void textBox5_TextChanged(object sender, EventArgs e)
+        private void TxtBoxRetentionBlueTextChanged(object sender, EventArgs e)
         {
             if (_isInternalChange) return;
 
             try
             {
-                FormatText(textBox5, ref _retentionBlueSecond);
+                FormatText(TxtBoxRetentionBlue, ref _retentionBlueSecond);
+
             }
             finally
             {
                 _isInternalChange = false;
             }
         }
-        private void textBox4_TextChanged(object sender, EventArgs e)
+        private void TxtBoxRetentionRedTextChanged(object sender, EventArgs e)
         {
             if (_isInternalChange) return;
 
             try
             {
-                FormatText(textBox4, ref _retentionRedSecond);
+                FormatText(TxtBoxRetentionRed, ref _retentionRedSecond);
             }
             finally
             {
@@ -156,13 +245,14 @@ namespace Scoreboard
             }
         }
 
-        private void textBox3_TextChanged(object sender, EventArgs e)
+        private void MainTimeTextChanged(object sender, EventArgs e)
         {
             if (_isInternalChange) return;
 
             try
             {
-                FormatText(textBox3, ref _remainingSeconds);
+                FormatText(MainTime, ref _remainingSeconds);
+
             }
             finally
             {
@@ -202,42 +292,32 @@ namespace Scoreboard
             txtBox.SelectionStart = nextCursor;
         }
         private void StartStopContractionTimer(System.Windows.Forms.Timer timer, Button button,
-            TextBox timeBox, ref int timeInSeconds, string message)
+      TextBox timeBox, ref int timeInSeconds, string mode)
         {
             if (!timer.Enabled && !timeBox.Text.Contains('_'))
             {
-
-                _holdIsOn = button;
+                StopHoldTimer(timer);
                 timer.Start();
                 button.Text = "Стоп";
+                if (timer == ContractionTimer)
+                    viewerForm.SetMainForeColor(true);
             }
-            else if (timer.Enabled)
+            else if (timer.Enabled && button.Text == "Стоп")
             {
-                if (button.Text == "Стоп")
+                timer.Stop();
+                if (timer == ContractionTimer)
                 {
-                    timer.Stop();
-                    if (timer == ContractionTimer)
-                        StopAllTimer();
-                    button.Text = message;
+                    StopAllTimer();
+                    viewerForm.SetMainForeColor(false);
                 }
-                else
-                {
-                    RebootTimer(timer, timeBox, 0, ref timeInSeconds);
-                    if (button.Text == "Болевой")
-                    {
-                        _holdIsOn.Text = "Удерж";
-                        button.Text = "Стоп";
-                        timer.Start();
-
-                    }
-                    else
-                    {
-                        _holdIsOn.Text = "Болевой";
-                        button.Text = "Стоп";
-                        timer.Start();
-
-                    }
-                }
+                button.Text = mode;
+            }
+            else if (timer.Enabled && button.Text != "Стоп")
+            {
+                StopHoldTimer(timer);
+                RebootTimer(timer, timeBox, 0, ref timeInSeconds);
+                timer.Start();
+                button.Text = "Стоп";
             }
             else
             {
@@ -245,6 +325,23 @@ namespace Scoreboard
             }
         }
 
+
+
+        private void StopHoldTimer(System.Windows.Forms.Timer activeTimer)
+        {
+            if (activeTimer == RedRetentionTimer)
+            {
+                RedRetentionTimer.Stop();
+                BtnRetentionRed.Text = "Удерж";
+                BtnPainfulHoldRed.Text = "Болевой";
+            }
+            else if (activeTimer == BlueRetentionTimer)
+            {
+                BlueRetentionTimer.Stop();
+                BtnRetentionBlue.Text = "Удерж";
+                BtnPainfulHoldBlue.Text = "Болевой";
+            }
+        }
 
         private void OnContractionTimerTick(System.Windows.Forms.Timer timer, ref int timeInSeconds, TextBox txtBox)
         {
@@ -265,6 +362,7 @@ namespace Scoreboard
 
         private void UpdateWarningScore(ComboBox warningComboBox, ref int previousWarning, TextBox scoreBox)
         {
+            bool nothing = false;
             int currentScore = int.TryParse(scoreBox.Text, out int n) ? n : 0;
 
             if (int.TryParse(warningComboBox.SelectedItem?.ToString(), out int selectedWarning))
@@ -277,18 +375,39 @@ namespace Scoreboard
             {
                 currentScore -= previousWarning;
                 previousWarning = 0;
+                nothing = true;
             }
 
-            scoreBox.Text = Math.Max(0, currentScore).ToString();
+            int score = Math.Max(0, currentScore);
+            _isInternalChange = true;
+            scoreBox.Text = score.ToString();
+            _isInternalChange = false;
+            if (scoreBox == ScoreBlue)
+            {
+                viewerForm?.SetBlueScore(score);
+                viewerForm?.SetPreviousRedWarning(nothing ? -1 : previousWarning);
+            }
+            else if (scoreBox == ScoreRed)
+            {
+                viewerForm?.SetRedScore(score);
+                viewerForm?.SetPreviousBlueWarning(nothing ? -1 : previousWarning);
+               
+            }
         }
 
 
         private void StopAllTimer()
         {
-            timer1.Stop();
-            button10.Text = "Удерж";
-            timer2.Stop();
-            button11.Text = "Удерж";
+            ContractionTimer.Stop();
+            RedRetentionTimer.Stop();
+            BlueRetentionTimer.Stop();
+
+            BtnStartStopMain.Text = "Старт";
+            BtnPainfulHoldRed.Text = "Болевой";
+            BtnRetentionRed.Text = "Удерж";
+            BtnRetentionBlue.Text = "Удерж";
+            BtnPainfulHoldBlue.Text = "Болевой";
+
         }
 
         private void ModifyScore(TextBox textBox, int change)
@@ -297,7 +416,12 @@ namespace Scoreboard
             {
                 int newScore = Math.Max(0, currentScore + change);
                 textBox.Text = newScore.ToString();
+                if (textBox == ScoreBlue)
+                    viewerForm.SetBlueScore(newScore);
+                else if (textBox == ScoreRed)
+                    viewerForm.SetRedScore(newScore);
             }
+
         }
 
 
@@ -312,20 +436,171 @@ namespace Scoreboard
             }
         }
 
+        private void Numeric_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == '.' ||
+                (!char.IsDigit(e.KeyChar) && e.KeyChar != (char)Keys.Back &&
+                 e.KeyChar != (char)Keys.Delete && e.KeyChar != '+'))
+            {
+                e.Handled = true;
+            }
+        }
 
         private void NumericTextBox_KeyPress(object sender, KeyPressEventArgs e)
         {
-            // Фильтр ввода в оценки 
             if (e.KeyChar == '.' || !char.IsDigit(e.KeyChar) && e.KeyChar != (char)Keys.Back &&
                e.KeyChar != (char)Keys.Delete)
             {
                 e.Handled = true;
             }
-            /* Как происходит
-             У нас имеется e.Key это вводимый символ и если он не является предсталеным
-            случаям то он вводиться если нет то он пропускаеся(e.Handled = true) */
+        }
+
+       
+
+
+        private void textBoxCategory_TextChanged(object sender, EventArgs e)
+        {
+            viewerForm.SetCategory(TxtBoxCategory.Text);
+        }
+        private string GetFilePathForCategory()
+        {
+            string category = TxtBoxCategory.Text.Trim();
+            if (string.IsNullOrWhiteSpace(category))
+                category = "default";
+
+            string fileName = category.Replace(" ", "").Replace("кг", "kg") + ".txt";
+            return Path.Combine(folder, fileName);
+        }
+
+        private void UpdateAutoComplete()
+        {
+            string path = GetFilePathForCategory();
+            if (!File.Exists(path)) File.Create(path).Close();
+
+            string[] names = File.ReadAllLines(path);
+            var autoComplete = new AutoCompleteStringCollection();
+            autoComplete.AddRange(names);
+
+            SetupTextBoxAutoComplete(TxtBoxSurnameRed, autoComplete);
+            SetupTextBoxAutoComplete(TxtBoxSurnameBlue, autoComplete);
+
+            TxtBoxSurnameRed.PlaceholderText = "Фамилия красного участника";
+            TxtBoxSurnameBlue.PlaceholderText = "Фамилия синего участника";
+        }
+        private void SetupTextBoxAutoComplete(TextBox textBox, AutoCompleteStringCollection source)
+        {
+            textBox.AutoCompleteCustomSource = source;
+            textBox.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+            textBox.AutoCompleteSource = AutoCompleteSource.CustomSource;
+        }
+
+        private void SaveNameIfNew(string name)
+        {
+            string path = GetFilePathForCategory();
+            name = name.Trim();
+            if (string.IsNullOrWhiteSpace(name)) return;
+
+            var existing = File.ReadAllLines(path);
+            if (!existing.Contains(name, StringComparer.OrdinalIgnoreCase))
+            {
+                File.AppendAllText(path, name + Environment.NewLine);
+            }
+        }
+
+        private void TxtBoxSurnameRedTextChanged(object sender, EventArgs e)
+        {
+            viewerForm.SetRedName(TxtBoxSurnameRed.Text);
+        }
+
+        private void TxtBoxSurnameBlueTextChanged(object sender, EventArgs e)
+        {
+            viewerForm.SetBlueName(TxtBoxSurnameBlue.Text);
         }
 
 
+
+
+
+        private void textBoxCategory_Leave(object sender, EventArgs e)
+        {
+            UpdateAutoComplete();
+
+        }
+
+        private void Reset_Click(object sender, EventArgs e)
+        {
+            BtnResetMainTimeClick(sender, e);
+            BtnResetRetentionRedClick(sender, e);
+            BtnResetRetentionBlueClick(sender, e);
+            BtnResetMedicalTimeRedClick(sender, e);
+            BtnResetMedicalTimeBlueClick(sender, e);
+            RedWarning.SelectedIndex = 0;
+            BlueWarning.SelectedIndex = 0;
+            UpdateWarningScore(BlueWarning, ref _previousBlueWarning, ScoreBlue);
+            UpdateWarningScore(RedWarning, ref _previousRedWarning, ScoreRed);
+            ScoreRed.Text = "0";
+            ScoreBlue.Text = "0";
+            viewerForm.SetBlueScore(0);
+            viewerForm.SetRedScore(0);
+            TxtBoxSurnameRed.Text = "";
+            TxtBoxSurnameBlue.Text = "";
+            TxtBoxSurnameRedTextChanged(sender, e);
+            TxtBoxSurnameBlueTextChanged(sender, e);
+        }
+
+        private void TxtBoxGenderTextChanged(object sender, EventArgs e)
+        {
+            viewerForm.SetGender(TxtBoxGender.Text);
+        }
+
+        private void TxtBoxMedicalRedTextChanged(object sender, EventArgs e)
+        {
+            if (_isInternalChange) return;
+
+            try
+            {
+                FormatText(TxtBoxMedicalRed, ref _medicalTimeRed);
+            }
+            finally
+            {
+                _isInternalChange = false;
+            }
+        }
+
+        private void TxtBoxMedicalBlueTextChanged(object sender, EventArgs e)
+        {
+            if (_isInternalChange) return;
+
+            try
+            {
+                FormatText(TxtBoxMedicalBlue, ref _medicalTimeBlue);
+            }
+            finally
+            {
+                _isInternalChange = false;
+            }
+        }
+
+        private void textBoxRed_Validating(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            SaveNameIfNew(TxtBoxSurnameRed.Text);
+            UpdateAutoComplete();
+        }
+
+        private void textBoxBlue_Validating(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            SaveNameIfNew(TxtBoxSurnameBlue.Text);
+            UpdateAutoComplete();
+        }
+
+        private void ScoreRed_TextChanged(object sender, EventArgs e)
+        {
+            ModifyScore(ScoreRed, 0);
+        }
+
+        private void ScoreBlueTextChanged(object sender, EventArgs e)
+        {
+            ModifyScore(ScoreBlue, 0);
+        }
     }
 }
